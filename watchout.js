@@ -1,6 +1,6 @@
 // start slingin' some d3 here.
-var w = 500;
-var h = 500;
+var w = window.innerWidth;
+var h = window.innerHeight;
 
 var enemies = [];
 var players = [];
@@ -19,6 +19,7 @@ function dragmove(d) {
 }
 
 
+var previousCollision = false;
 var checkCollisions = function() {
   //create enemies array of d3 objects
   var $enemies = d3.selectAll('image');
@@ -28,6 +29,7 @@ var checkCollisions = function() {
     enemies[i].setY(parseFloat($enemies[0][i].attributes.y.value));
   }
   // check collisions
+  var collision = false;
   for (var i = 0; i < enemies.length; i++) {
     // x and y of enemy is from the top left corner of image, so add r to x and y to determine center
     var enemyX = enemies[i].x + enemies[i]._w/2;
@@ -35,17 +37,21 @@ var checkCollisions = function() {
     // Calculate the distance of the enemy center from the player center
     var d = Math.sqrt(Math.pow(enemyX - player.x, 2) + Math.pow(enemyY - player.y, 2));
     // Compare the distance to the sum of the radii
+
     if (d < enemies[i]._w/2 + player.r) {
-      collisionCounter++;
-      document.getElementsByClassName('collisions')[0].children[0].innerText = collisionCounter;
-      if (score > highScore) {
-        highScore = score;
-      }
-      score = 0;
-      document.getElementsByClassName('high')[0].children[0].innerText = highScore;
+      collision = true;
     }
   }
 
+  if (collision !== previousCollision) {
+    collisionCounter += 1;
+    highScore = Math.max(highScore, score);
+    score = 0;
+    document.getElementsByClassName('high')[0].children[0].innerText = highScore;
+    document.getElementsByClassName('collisions')[0].children[0].innerText = collisionCounter;
+  }
+
+  previousCollision = collision;
 
 };
 
@@ -57,10 +63,10 @@ var drag = d3.behavior.drag()
 
 var svg = d3.select('body').append('svg');
 
-svg.attr('height', h).attr('width', w);
+svg.attr('height', h).attr('width', w).attr('class', 'background');
 
-for (var i = 0; i < 10; i++) {
-  enemies.push(new Enemy(i, Math.random() * w, Math.random() * h, 'asteroid.png'));
+for (var i = 0; i < 20; i++) {
+  enemies.push(new Enemy(i, Math.random() * w, Math.random() * h, 'asteroid.png', w, h));
   svg.append('image')
     .datum(enemies[i])
     .attr(enemies[i].getAttr());
@@ -70,6 +76,7 @@ var player = new Player(0, w/2, h/2, w, h);
 
 svg.append('circle')
   .attr(player.getAttr())
+  .attr('class', 'playersvg')
   .call(drag);
 
 var refresh = function () {
@@ -90,5 +97,5 @@ var refresh = function () {
 
 
 var motion = setInterval(refresh, 1000);
-var collisions = setInterval(checkCollisions, 50);
-
+//var collisions = setInterval(checkCollisions, 50);
+d3.timer(checkCollisions);
