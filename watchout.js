@@ -11,6 +11,48 @@ var collisionCounter = 0;
 var score = 0;
 var highScore = 0;
 
+var keyMap = {
+  updatePlayer: function(id, property, amount) {
+    players[id][property] = Math.max(players[id].r,
+      Math.min(w - players[id].r,players[id][property] + amount));
+  },
+  37: function() {
+    this.updatePlayer(0,'x', -15);
+  },
+  39: function() {
+    this.updatePlayer(0,'x', 15);
+  },
+  38: function() {
+    this.updatePlayer(0,'y', -15);
+  },
+  40: function() {
+    this.updatePlayer(0,'y', 15);
+  },
+  65: function() {
+    this.updatePlayer(1,'x', -15);
+  },
+  68: function() {
+    this.updatePlayer(1,'x', 15);
+  },
+  87: function() {
+    this.updatePlayer(1,'y', -15);
+  },
+  83: function() {
+    this.updatePlayer(1,'y', 15);
+  },
+  74: function() {
+    this.updatePlayer(2,'x', -15);
+  },
+  76: function() {
+    this.updatePlayer(2,'x', 15);
+  },
+  73: function() {
+    this.updatePlayer(2,'y', -15);
+  },
+  75: function() {
+    this.updatePlayer(2,'y', 15);
+  },
+};
 
 //store d3 circle x and y values in player x and y
 var dragmove = function (d) {
@@ -25,61 +67,48 @@ var keyMove = function (d) {
   var key = d3.event.keyCode;
   console.log(key);
 
-
 //player0
-  if (key === 40) {
-    //go down
-    players[0].y = Math.max(players[0].r, Math.min(h - players[0].r, players[0].y + 15));
-  }
-  if (key === 38) {
-    //go up
-    players[0].y = Math.max(players[0].r, Math.min(h - players[0].r, players[0].y - 15));
-  }
-  if (key === 37) {
-    //go left
-    players[0].x = Math.max(players[0].r, Math.min(w - players[0].r, players[0].x - 15));
-  }
-  if (key === 39) {
-    //go right
-    players[0].x = Math.max(players[0].r, Math.min(w - players[0].r, players[0].x + 15));
-  }
 
 
-//player 1
-  if (key === 83) {
-    //go down
-    players[1].y = Math.max(players[1].r, Math.min(h - players[1].r, players[1].y + 15));
-  }
-  if (key === 87) {
-    //go up
-    players[1].y = Math.max(players[1].r, Math.min(h - players[1].r, players[1].y - 15));
-  }
-  if (key === 65) {
-    //go left
-    players[1].x = Math.max(players[1].r, Math.min(w - players[1].r, players[1].x - 15));
-  }
-  if (key === 68) {
-    //go right
-    players[1].x = Math.max(players[1].r, Math.min(w - players[1].r, players[1].x + 15));
-  }
+  keyMap[key]();
 
-//player 2
-  if (key === 75) {
-    //go down
-    players[2].y = Math.max(players[2].r, Math.min(h - players[2].r, players[2].y + 15));
-  }
-  if (key === 73) {
-    //go up
-    players[2].y = Math.max(players[2].r, Math.min(h - players[2].r, players[2].y - 15));
-  }
-  if (key === 74) {
-    //go left
-    players[2].x = Math.max(players[2].r, Math.min(w - players[2].r, players[2].x - 15));
-  }
-  if (key === 76) {
-    //go right
-    players[2].x = Math.max(players[2].r, Math.min(w - players[2].r, players[2].x + 15));
-  }
+
+
+// //player 1
+//   if (key === 65) {
+//     //go left
+//     players[1].x = Math.max(players[1].r, Math.min(w - players[1].r, players[1].x - 15));
+//   }
+//   if (key === 68) {
+//     //go right
+//     players[1].x = Math.max(players[1].r, Math.min(w - players[1].r, players[1].x + 15));
+//   }
+//   if (key === 87) {
+//     //go up
+//     players[1].y = Math.max(players[1].r, Math.min(h - players[1].r, players[1].y - 15));
+//   }
+//   if (key === 83) {
+//     //go down
+//     players[1].y = Math.max(players[1].r, Math.min(h - players[1].r, players[1].y + 15));
+//   }
+
+// //player 2
+//   if (key === 74) {
+//     //go left
+//     players[2].x = Math.max(players[2].r, Math.min(w - players[2].r, players[2].x - 15));
+//   }
+//   if (key === 76) {
+//     //go right
+//     players[2].x = Math.max(players[2].r, Math.min(w - players[2].r, players[2].x + 15));
+//   }
+//   if (key === 73) {
+//     //go up
+//     players[2].y = Math.max(players[2].r, Math.min(h - players[2].r, players[2].y - 15));
+//   }
+//   if (key === 75) {
+//     //go down
+//     players[2].y = Math.max(players[2].r, Math.min(h - players[2].r, players[2].y + 15));
+//   }
 
   d3.select('.player0')
       .attr('cx', this.x = players[0].x)
