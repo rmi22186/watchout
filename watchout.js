@@ -1,22 +1,96 @@
 // start slingin' some d3 here.
-var w = window.innerWidth;
-var h = window.innerHeight;
+var w = window.innerWidth*(0.9);
+var h = window.innerHeight*(0.9);
+var numPlayers = 3;
+var numEnemies = 15;
 
 var enemies = [];
 var players = [];
+var colors = ['red', 'green', 'yellow', 'blue'];
 var collisionCounter = 0;
 var score = 0;
 var highScore = 0;
 
 
 //store d3 circle x and y values in player x and y
-function dragmove(d) {
+var dragmove = function (d) {
   player.x = Math.max(player.r, Math.min(w - player.r, d3.event.x));
   player.y = Math.max(player.r, Math.min(h - player.r, d3.event.y));
   d3.select(this)
       .attr('cx', this.x = player.x)
       .attr('cy', this.y = player.y);
-}
+};
+
+var keyMove = function (d) {
+  var key = d3.event.keyCode;
+  console.log(key);
+
+
+//player0
+  if (key === 40) {
+    //go down
+    players[0].y = Math.max(players[0].r, Math.min(h - players[0].r, players[0].y + 15));
+  }
+  if (key === 38) {
+    //go up
+    players[0].y = Math.max(players[0].r, Math.min(h - players[0].r, players[0].y - 15));
+  }
+  if (key === 37) {
+    //go left
+    players[0].x = Math.max(players[0].r, Math.min(w - players[0].r, players[0].x - 15));
+  }
+  if (key === 39) {
+    //go right
+    players[0].x = Math.max(players[0].r, Math.min(w - players[0].r, players[0].x + 15));
+  }
+
+
+//player 1
+  if (key === 83) {
+    //go down
+    players[1].y = Math.max(players[1].r, Math.min(h - players[1].r, players[1].y + 15));
+  }
+  if (key === 87) {
+    //go up
+    players[1].y = Math.max(players[1].r, Math.min(h - players[1].r, players[1].y - 15));
+  }
+  if (key === 65) {
+    //go left
+    players[1].x = Math.max(players[1].r, Math.min(w - players[1].r, players[1].x - 15));
+  }
+  if (key === 68) {
+    //go right
+    players[1].x = Math.max(players[1].r, Math.min(w - players[1].r, players[1].x + 15));
+  }
+
+//player 2
+  if (key === 75) {
+    //go down
+    players[2].y = Math.max(players[2].r, Math.min(h - players[2].r, players[2].y + 15));
+  }
+  if (key === 73) {
+    //go up
+    players[2].y = Math.max(players[2].r, Math.min(h - players[2].r, players[2].y - 15));
+  }
+  if (key === 74) {
+    //go left
+    players[2].x = Math.max(players[2].r, Math.min(w - players[2].r, players[2].x - 15));
+  }
+  if (key === 76) {
+    //go right
+    players[2].x = Math.max(players[2].r, Math.min(w - players[2].r, players[2].x + 15));
+  }
+
+  d3.select('.player0')
+      .attr('cx', this.x = players[0].x)
+      .attr('cy', this.y = players[0].y);
+  d3.select('.player1')
+      .attr('cx', this.x = players[1].x)
+      .attr('cy', this.y = players[1].y);
+  d3.select('.player2')
+      .attr('cx', this.x = players[2].x)
+      .attr('cy', this.y = players[2].y);
+};
 
 
 var previousCollision = false;
@@ -35,10 +109,10 @@ var checkCollisions = function() {
     var enemyX = enemies[i].x + enemies[i]._w/2;
     var enemyY = enemies[i].y + enemies[i]._w/2;
     // Calculate the distance of the enemy center from the player center
-    var d = Math.sqrt(Math.pow(enemyX - player.x, 2) + Math.pow(enemyY - player.y, 2));
+    var d = Math.sqrt(Math.pow(enemyX - players[0].x, 2) + Math.pow(enemyY - players[0].y, 2));
     // Compare the distance to the sum of the radii
 
-    if (d < enemies[i]._w/2 + player.r) {
+    if (d < enemies[i]._w/2 + players[0].r) {
       collision = true;
     }
   }
@@ -61,23 +135,29 @@ var drag = d3.behavior.drag()
     .on('drag', dragmove);
 
 
-var svg = d3.select('body').append('svg');
+var svg = d3.select('body').on('keydown', keyMove).append('svg');
 
 svg.attr('height', h).attr('width', w).attr('class', 'background');
 
-for (var i = 0; i < 20; i++) {
+for (var i = 0; i < numEnemies; i++) {
   enemies.push(new Enemy(i, Math.random() * w, Math.random() * h, 'asteroid.png', w, h));
   svg.append('image')
     .datum(enemies[i])
     .attr(enemies[i].getAttr());
 }
 
-var player = new Player(0, w/2, h/2, w, h);
+for (var i = 0; i < numPlayers; i++) {
+  players.push(new Player(i, (i+1)*w/(numPlayers+2), h/2, w, h));
+  svg.append('circle')
+  .attr('class', 'player' + i)
+  .attr(players[i].getAttr())
+  .attr('fill', colors[i]);
+}
 
-svg.append('circle')
-  .attr(player.getAttr())
-  .attr('class', 'playersvg')
-  .call(drag);
+// svg.append('circle')
+//   .attr(player2.getAttr())
+//   .attr('class', 'player2')
+//   .call(drag);
 
 var refresh = function () {
   for (var i = 0; i < enemies.length; i++){
@@ -87,7 +167,7 @@ var refresh = function () {
 
   svg.selectAll('image')
     .data(enemies, function(d) { return d.id; })
-    .transition().duration(1000)
+    .transition().duration(2000)
     .attr('x', function(d) { return d.x; })
     .attr('y', function(d) { return d.y; });
 
@@ -96,6 +176,6 @@ var refresh = function () {
 };
 
 
-var motion = setInterval(refresh, 1000);
+var motion = setInterval(refresh, 2000);
 //var collisions = setInterval(checkCollisions, 50);
 d3.timer(checkCollisions);
